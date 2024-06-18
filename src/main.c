@@ -4,32 +4,70 @@
 #include <stdlib.h>
 #include <time.h>
 
-void test_heap(void) {
-    int* array = (int*)malloc(sizeof(int) * 10);
+typedef struct fgh {
+    int f;
+    int g;
+    int h;
+} fgh_t;
 
-    srand(time(NULL));
+int compare(void* a, void* b) {
+    fgh_t* obj_a = a;
+    fgh_t* obj_b = b;
 
-    printf("setting up first array.\n");
-    for (int i = 0; i < 10; ++i) {
-        int rand_num = rand() % 100;
-        array[i] = rand_num;
-        printf("%d\n", rand_num);
+    if (obj_a->f < obj_b->f) {
+        return -1;
+    } else if (obj_a->f > obj_b->f) {
+        return 1;
     }
 
-    printf("\n\nsetting up heap\n");
-    minheap_t* heap = heap_create(array, 10);
+    return 0;
+}
 
-    free(array);
+void free_data(void* d) {
+    fgh_t* data = d;
+
+    free(d);
+}
+
+void test_heap(void) {
+    srand(time(NULL));
+
+    void** array = malloc(sizeof(fgh_t*) * 10);
+
+    minheap_t* heap = heap_create(array, sizeof(fgh_t*), 0, 10, &compare);
+
+    for (int i = 200; i >= 0; i--) {
+        fgh_t* new_obj = malloc(sizeof(fgh_t*));
+        int rand_num = rand() % 10000;
+        new_obj->f = rand_num;
+        new_obj->h = rand_num * 10;
+        new_obj->g = rand_num % 100;
+
+        heap_push(heap, new_obj);
+    }
+
+    for (int i = 0; i < 10; i++) {
+        fgh_t* obj = heap_pop(heap);
+        printf("%d\n", obj->f);
+    }
+
+    heap_clear(heap, &free_data);
 
     heap_print(heap);
 
-    heap_set(heap, -1, 9);
+    free(heap->array);
+    heap->array = NULL;
 
-    printf("\nPopping heap...\n");
-    for (int i = 0; i < 10; ++i) {
-        int num = heap_pop(heap);
-        printf("n: %d\n", num);
+    free(heap);
+}
+
+void heap_print(const minheap_t* const h) {
+    printf("heap_print: START\n");
+    for (int i = 0; i < h->count; ++i) {
+        fgh_t* obj = h->array[i];
+        printf("%d\n", obj->f);
     }
+    printf("heap_print: END\n");
 }
 
 void test_print_linkedlist(const linkedlist_t* const ll) {
@@ -125,4 +163,68 @@ void test_linkedlist(void) {
     free_linkedlist(ll);
 }
 
-int main(void) { test_linkedlist(); }
+typedef struct pt {
+    int x;
+    int y;
+} pt_t;
+
+void test_print_array(int c, int r, pt_t*** array) {
+    for (int j = 0; j < r; j++) {
+        for (int i = 0; i < c; i++) {
+            pt_t* pt = array[j][i];
+            printf("i: %d, j: %d, pt: %d, %d\n", i, j, pt->x, pt->y);
+        }
+    }
+}
+
+void test_array_pointer() {
+    /*
+    int count = 0;
+    int array[5][5] = {{0}};
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            array[i][j] = count;
+            count++;
+        }
+    }
+    */
+
+    int c = 5;
+    int r = 5;
+
+    pt_t*** array = malloc(sizeof(pt_t**) * r);
+    for (int i = 0; i < r; i++) {
+        pt_t** col = malloc(sizeof(pt_t*) * c);
+        array[i] = col;
+    }
+
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            pt_t* pt = malloc(sizeof(pt_t));
+            pt->x = j;
+            pt->y = i;
+            array[j][i] = pt;
+        }
+    }
+
+    test_print_array(c, r, array);
+
+    for (int j = 0; j < r; j++) {
+        for (int i = 0; i < c; i++) {
+            pt_t* pt = array[j][i];
+            free(pt);
+        }
+
+        free(array[j]);
+    }
+
+    free(array);
+}
+
+int main(void) {
+    // test_linkedlist();
+
+    // test_array_pointer();
+
+    test_heap();
+}
