@@ -9,8 +9,8 @@ void test_astar() {
     int ex = 4;
     int ey = 4;
 
-    list_t *return_path = list_create(10, sizeof(pt_t), NULL);
-    list_t *blockers = list_create(10, sizeof(pt_t), NULL);
+    list_t *return_path = list_create(10, sizeof(pt_t));
+    list_t *blockers = list_create(10, sizeof(pt_t));
     list_append(blockers, astar_create_pt(4, 0));
     list_append(blockers, astar_create_pt(3, 1));
     list_append(blockers, astar_create_pt(2, 2));

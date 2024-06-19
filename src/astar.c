@@ -220,7 +220,7 @@ void astar_start_path_finding(list_t *return_path, int col_size, int row_size, i
 
     pt_t **steps = astar_create_steps();
 
-    list_t *close_list = list_create(10, sizeof(pf_node_t), NULL);
+    list_t *close_list = list_create(10, sizeof(pf_node_t));
     minheap_t *open_heap = heap_create(sizeof(pf_node_t), 10, &astar_comparator_heap);
     heap_push(open_heap, start_node);
 
@@ -237,7 +237,7 @@ void astar_start_path_finding(list_t *return_path, int col_size, int row_size, i
 
         list_append(close_list, curr_node);
 
-        list_t *valid_pts = list_create(10, sizeof(pt_t), NULL);
+        list_t *valid_pts = list_create(10, sizeof(pt_t));
         astar_set_valid_pts(valid_pts, curr_node, steps, blockers, col_size, row_size);
 
         for (int i = 0; i < valid_pts->count; i++) {

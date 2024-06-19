@@ -15,19 +15,6 @@ void test_list_free_data(void *d) {
     free(d);
 }
 
-int test_list_compare(void *a, void *b) {
-    fgh_t *obj_a = a;
-    fgh_t *obj_b = b;
-
-    if (obj_a->f < obj_b->f) {
-        return -1;
-    } else if (obj_a->f > obj_b->f) {
-        return 1;
-    }
-
-    return 0;
-}
-
 void test_list_print(list_t *l) {
     for (int i = 0; i < l->count; i++) {
         fgh_t *data = l->array[i];
@@ -38,7 +25,7 @@ void test_list() {
     int obj_size = sizeof(fgh_t *);
     int capacity = 5;
     void **array = malloc(capacity * obj_size);
-    list_t *list = list_create(capacity, obj_size, &test_list_compare);
+    list_t *list = list_create(capacity, obj_size);
 
     for (int i = 0; i < 5; i++) {
         fgh_t *data = malloc(obj_size);
