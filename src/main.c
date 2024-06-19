@@ -7,9 +7,9 @@
 #include <stdlib.h>
 
 int main(void) {
-    // test_linkedlist();
+    test_linkedlist();
 
-    test_array_pointer();
+    // test_array_pointer();
 
     // test_minheap();
 

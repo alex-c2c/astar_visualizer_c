@@ -2,14 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void swap_element(const minheap_t* h, const int a, const int b) {
-    void* tmp = h->array[a];
+void swap_element(const minheap_t *h, const int a, const int b) {
+    void *tmp = h->array[a];
     h->array[a] = h->array[b];
     h->array[b] = tmp;
 }
 
-void double_heap_capacity(minheap_t* const h) {
-    void** new_array = malloc(h->obj_size * h->capacity * 2);
+void double_heap_capacity(minheap_t *const h) {
+    void **new_array = malloc(h->obj_size * h->capacity * 2);
 
     for (int i = 0; i < h->count; ++i) {
         new_array[i] = h->array[i];
@@ -21,7 +21,7 @@ void double_heap_capacity(minheap_t* const h) {
     h->capacity *= 2;
 }
 
-void sift_down(minheap_t* const h, int curr, const int end) {
+void sift_down(minheap_t *const h, int curr, const int end) {
     int left = (curr * 2) + 1;
     while (left <= end) {
         int right = left + 1;
@@ -44,7 +44,7 @@ void sift_down(minheap_t* const h, int curr, const int end) {
     }
 }
 
-void sift_up(minheap_t* const h) {
+void sift_up(minheap_t *const h) {
     int child = h->count - 1;
     int parent = (child - 1) / 2;
 
@@ -55,7 +55,7 @@ void sift_up(minheap_t* const h) {
     }
 }
 
-void heap_fix(minheap_t* const h) {
+void heap_fix(minheap_t *const h) {
     int end = h->count - 1;
     int last_non_leaf_index = (h->count - 2) / 2;
 
@@ -64,16 +64,23 @@ void heap_fix(minheap_t* const h) {
     }
 }
 
-minheap_t* heap_create(void** const array, const int obj_size, const int count, const int capacity, int (*compare_func)(void*, void*)) {
-    minheap_t* h = (minheap_t*)malloc(sizeof(minheap_t));
+minheap_t *heap_create(const int obj_size, const int capacity, int (*compare_func)(void *, void *)) {
+    minheap_t *h = malloc(sizeof(minheap_t));
     if (h == NULL) {
         printf("Unable to malloc minheap\n");
         return NULL;
     }
 
+    void **array = malloc(obj_size * capacity);
+    if (array == NULL) {
+        free(h);
+        printf("Unable to malloc array in minheap_t\n");
+        return NULL;
+    }
+
     h->array = array;
     h->obj_size = obj_size;
-    h->count = count;
+    h->count = 0;
     h->capacity = capacity;
     h->compare_func = compare_func;
 
@@ -82,7 +89,7 @@ minheap_t* heap_create(void** const array, const int obj_size, const int count, 
     return h;
 }
 
-void heap_push(minheap_t* const h, void* const value) {
+void heap_push(minheap_t *const h, void *const value) {
     if (h->count == h->capacity) {
         double_heap_capacity(h);
     }
@@ -93,8 +100,8 @@ void heap_push(minheap_t* const h, void* const value) {
     sift_up(h);
 }
 
-void* heap_pop(minheap_t* const h) {
-    void* element = h->array[0];
+void *heap_pop(minheap_t *const h) {
+    void *element = h->array[0];
     h->array[0] = NULL;
 
     swap_element(h, 0, h->count - 1);
@@ -106,12 +113,12 @@ void* heap_pop(minheap_t* const h) {
     return element;
 }
 
-void heap_set(minheap_t* const h, void* const value, const int index) {
+void heap_set(minheap_t *const h, void *const value, const int index) {
     h->array[index] = value;
     heap_fix(h);
 }
 
-void heap_clear(minheap_t* const h, void (*free_data)(void*)) {
+void heap_clear(minheap_t *const h, void (*free_data)(void *)) {
     for (int i = 0; i < h->count; i++) {
         if (free_data != NULL) {
             free_data(h->array[i]);
@@ -121,4 +128,12 @@ void heap_clear(minheap_t* const h, void (*free_data)(void*)) {
     }
 
     h->count = 0;
+}
+
+void heap_free(minheap_t *const h, void (*free_data)(void *)) {
+    heap_clear(h, free_data);
+
+    free(h->array);
+
+    free(h);
 }

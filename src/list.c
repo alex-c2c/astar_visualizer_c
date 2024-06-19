@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void double_list_capacity(list_t* const l) {
-    void** new_array = malloc(l->obj_size * l->capacity * 2);
+void double_list_capacity(list_t *const l) {
+    void **new_array = malloc(l->obj_size * l->capacity * 2);
 
     for (int i = 0; i < l->count; ++i) {
         new_array[i] = l->array[i];
@@ -15,7 +15,7 @@ void double_list_capacity(list_t* const l) {
     l->capacity *= 2;
 }
 
-void list_append(list_t* const l, void* data) {
+void list_append(list_t *const l, void *data) {
     if (l->count == l->capacity) {
         double_list_capacity(l);
     }
@@ -24,7 +24,7 @@ void list_append(list_t* const l, void* data) {
     l->count++;
 }
 
-void list_insert(list_t* const l, void* data, int index) {
+void list_insert(list_t *const l, void *data, int index) {
     if (index >= l->count) {
         printf("list_insert: Index(%d) out of bounds(%d)\n", index, l->count);
         return;
@@ -42,13 +42,13 @@ void list_insert(list_t* const l, void* data, int index) {
     l->count++;
 }
 
-void list_remove(list_t* const l, int index, void (*free_data)(void*)) {
+void list_remove(list_t *const l, int index, void (*free_data)(void *)) {
     if (index >= l->count) {
         printf("list_remove: Index(%d) out of bounds(%d)\n", index, l->count);
         return;
     }
 
-    void* data = l->array[index];
+    void *data = l->array[index];
     if (free_data != NULL) {
         free_data(data);
     }
@@ -65,19 +65,27 @@ void list_remove(list_t* const l, int index, void (*free_data)(void*)) {
     l->count--;
 }
 
-void list_clear(list_t* const l, void (*free_data)(void*)) {
+void list_clear(list_t *const l, void (*free_data)(void *)) {
     for (int i = 0; i < l->count; i++) {
-        void* data = l->array[i];
+        void *data = l->array[i];
         if (free_data != NULL) {
             free_data(data);
-            data = NULL;
         }
+        data = NULL;
     }
 
     l->count = 0;
 }
 
-void* list_get(list_t* const l, int index) {
+void list_free(list_t *const l, void (*free_data)(void *)) {
+    list_clear(l, free_data);
+
+    free(l->array);
+
+    free(l);
+}
+
+void *list_get(list_t *const l, int index) {
     if (index >= l->count) {
         printf("list_remove: Index(%d) out of bounds(%d)\n", index, l->count);
         return NULL;
@@ -86,15 +94,15 @@ void* list_get(list_t* const l, int index) {
     return l->array[index];
 }
 
-list_t* list_create(void** const array, int count, int capacity, int obj_size, int (*compare_func)(void*, void*)) {
-    list_t* l = malloc(sizeof(list_t));
+list_t *list_create(int capacity, int obj_size, int (*compare_func)(void *, void *)) {
+    list_t *l = malloc(sizeof(list_t));
     if (l == NULL) {
         printf("Unable to malloc list\n");
         return NULL;
     }
 
-    l->array = array;
-    l->count = count;
+    l->array = malloc(capacity * obj_size);
+    l->count = 0;
     l->capacity = capacity;
     l->obj_size = obj_size;
     l->compare_func = compare_func;
