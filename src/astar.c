@@ -174,7 +174,7 @@ pf_node_t *astar_get_existing_node(minheap_t *heap, pt_t *pt) {
     }
 
     for (int i = 0; i < heap->count; i++) {
-        pf_node_t *node = heap_get(heap, i);
+        pf_node_t *node = minheap_get(heap, i);
         if (node->pt->x == pt->x && node->pt->y == pt->y) {
             return node;
         }
@@ -209,7 +209,7 @@ void free_steps(pt_t **steps) {
 
 void astar_free_all(pt_t **steps, list_t *close_list, minheap_t *open_heap, pt_t *end_pt) {
     list_free(close_list, &astar_free_node);
-    heap_free(open_heap, &astar_free_node);
+    minheap_free(open_heap, &astar_free_node);
     free_steps(steps);
     astar_free_pt(end_pt);
 }
@@ -221,11 +221,11 @@ void astar_start_path_finding(list_t *return_path, int col_size, int row_size, i
     pt_t **steps = astar_create_steps();
 
     list_t *close_list = list_create(10, sizeof(pf_node_t));
-    minheap_t *open_heap = heap_create(sizeof(pf_node_t), 10, &astar_comparator_heap);
-    heap_push(open_heap, start_node);
+    minheap_t *open_heap = minheap_create(sizeof(pf_node_t), 10, &astar_comparator_heap);
+    minheap_push(open_heap, start_node);
 
     while (open_heap->count > 0) {
-        pf_node_t *curr_node = heap_pop(open_heap);
+        pf_node_t *curr_node = minheap_pop(open_heap);
 
         if (astar_is_pt_equal(curr_node->pt, end_pt)) {
             astar_set_return_path(return_path, curr_node);
@@ -264,13 +264,13 @@ void astar_start_path_finding(list_t *return_path, int col_size, int row_size, i
                     existing_node->f = f;
                     existing_node->h = h;
                     existing_node->parent = curr_node;
-                    heap_fix(open_heap);
+                    minheap_fix(open_heap);
                 }
                 continue;
             }
 
             pf_node_t *new_node = astar_create_node(pt->x, pt->y, curr_node, f, g, h);
-            heap_push(open_heap, new_node);
+            minheap_push(open_heap, new_node);
         }
 
         list_free(valid_pts, &astar_free_pt);

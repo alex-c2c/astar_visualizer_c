@@ -44,7 +44,7 @@ void test_minheap(void) {
     int obj_size = sizeof(fgh_t);
     int capacity = 10;
 
-    minheap_t *heap = heap_create(obj_size, capacity, &test_minheap_compare);
+    minheap_t *heap = minheap_create(obj_size, capacity, &test_minheap_compare);
 
     for (int i = 200; i >= 0; i--) {
         fgh_t *new_obj = malloc(sizeof(fgh_t *));
@@ -53,17 +53,17 @@ void test_minheap(void) {
         new_obj->h = rand_num * 10;
         new_obj->g = rand_num % 100;
 
-        heap_push(heap, new_obj);
+        minheap_push(heap, new_obj);
     }
 
     for (int i = 0; i < 10; i++) {
-        fgh_t *obj = heap_pop(heap);
+        fgh_t *obj = minheap_pop(heap);
         printf("%d\n", obj->f);
     }
 
-    heap_clear(heap, &test_minheap_free_data);
+    minheap_clear(heap, &test_minheap_free_data);
 
     test_minheap_print(heap);
 
-    heap_free(heap, &test_minheap_free_data);
+    minheap_free(heap, &test_minheap_free_data);
 }
