@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <time.h>
 
-void ll_free_node(node_t *node, void (*free_data)(void *)) {
-    if (free_data != NULL) {
-        free_data(node->data);
+void ll_free_node(node_t *node, void (*func_free_data)(void *)) {
+    if (func_free_data != NULL) {
+        func_free_data(node->data);
     }
 
     node->next = NULL;
@@ -139,7 +139,7 @@ int ll_insert_at(linkedlist_t *const ll, void *const data, const int index) {
     return 0;
 }
 
-int ll_remove_node(linkedlist_t *const ll, node_t *dn, void (*free_data)(void *)) {
+int ll_remove_node(linkedlist_t *const ll, node_t *dn, void (*func_free_data)(void *)) {
     if (dn == NULL) {
         printf("ll_remove_node: node to be deleted is NULL.\n");
         return -1;
@@ -163,48 +163,48 @@ int ll_remove_node(linkedlist_t *const ll, node_t *dn, void (*free_data)(void *)
         next_node->prev = prev_node;
     }
 
-    ll_free_node(dn, free_data);
+    ll_free_node(dn, func_free_data);
 
     ll->count--;
 
     return 0;
 }
 
-int ll_remove_head(linkedlist_t *const ll, void (*free_data)(void *)) {
+int ll_remove_head(linkedlist_t *const ll, void (*func_free_data)(void *)) {
     if (ll->count <= 0) {
         printf("ll_remove_head: linked list is empty.\n");
         return -1;
     }
 
-    ll_remove_node(ll, ll->head, free_data);
+    ll_remove_node(ll, ll->head, func_free_data);
 
     return 0;
 }
 
-int ll_remove_tail(linkedlist_t *const ll, void (*free_data)(void *)) {
+int ll_remove_tail(linkedlist_t *const ll, void (*func_free_data)(void *)) {
     if (ll->count <= 0) {
         printf("ll_remove_tail: linked list is empty.\n");
         return -1;
     }
 
-    ll_remove_node(ll, ll->tail, free_data);
+    ll_remove_node(ll, ll->tail, func_free_data);
 
     return 0;
 }
 
-int ll_remove_at(linkedlist_t *const ll, const int index, void (*free_data)(void *)) {
+int ll_remove_at(linkedlist_t *const ll, const int index, void (*func_free_data)(void *)) {
     node_t *dn = ll_get_node_at(ll, index);
     if (dn == NULL) {
         printf("ll_remove_at: Index(%d) out of bounds(%d)\n", index, ll->count);
         return -1;
     }
 
-    ll_remove_node(ll, dn, free_data);
+    ll_remove_node(ll, dn, func_free_data);
 
     return 0;
 }
 
-int ll_remove_data(linkedlist_t *const ll, const void *const data, void (*free_data)(void *)) {
+int ll_remove_data(linkedlist_t *const ll, const void *const data, void (*func_free_data)(void *)) {
     if (ll->count <= 0) {
         printf("ll_remove_data: linked list is empty.\n");
         return -1;
@@ -213,7 +213,7 @@ int ll_remove_data(linkedlist_t *const ll, const void *const data, void (*free_d
     node_t *curr_node = ll->head;
     while (curr_node != NULL) {
         if (curr_node->data == data) {
-            ll_remove_node(ll, curr_node, free_data);
+            ll_remove_node(ll, curr_node, func_free_data);
             return 0;
         }
         curr_node = curr_node->next;
@@ -222,13 +222,13 @@ int ll_remove_data(linkedlist_t *const ll, const void *const data, void (*free_d
     return -1;
 }
 
-void ll_clear(linkedlist_t *const ll, void (*free_data)(void *)) {
+void ll_clear(linkedlist_t *const ll, void (*func_free_data)(void *)) {
     node_t *curr_node = ll->head;
     while (curr_node->next != NULL) {
         node_t *dn = curr_node;
         curr_node = curr_node->next;
 
-        ll_free_node(dn, free_data);
+        ll_free_node(dn, func_free_data);
     }
 
     ll->head = NULL;
@@ -236,8 +236,8 @@ void ll_clear(linkedlist_t *const ll, void (*free_data)(void *)) {
     ll->count = 0;
 }
 
-void ll_free(linkedlist_t *const ll, void (*free_data)(void *)) {
-    ll_clear(ll, free_data);
+void ll_free(linkedlist_t *const ll, void (*func_free_data)(void *)) {
+    ll_clear(ll, func_free_data);
 
     free(ll);
 }
