@@ -24,19 +24,19 @@ void test_file(void) {
     sprintf(output_file_path, "%s/%s", cwd, "data/output_tile_data.txt");
 
     char ***data = malloc(sizeof(char **));
-    size_t data_length = 0;
-    int read_result = file_read(data, &data_length, input_file_path);
+    size_t line_count = 0;
+    int read_result = file_read(data, &line_count, input_file_path);
 
     if (read_result != 0) {
         printf("[Error][test_file] test_file: unable to read from file\n");
         return;
     }
 
-    file_print_data(data, data_length);
+    file_print_data(data, line_count);
 
-    int write_result = file_write(data, data_length, output_file_path);
+    int write_result = file_write(data, line_count, output_file_path);
 
-    for (size_t i = 0; i < data_length; i++) {
+    for (size_t i = 0; i < line_count; i++) {
         free((*data)[i]);
     }
     free(*data);

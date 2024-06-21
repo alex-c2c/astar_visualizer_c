@@ -4,14 +4,14 @@
 
 #define LMAX 255
 
-void file_print_data(char **const *const data, const size_t data_length) {
-    printf("\nLines(%zu) in file:\n\n", data_length);
-    for (size_t i = 0; i < data_length; i++) {
+void file_print_data(char **const *const data, const size_t line_count) {
+    printf("\nLines(%zu) in file:\n\n", line_count);
+    for (size_t i = 0; i < line_count; i++) {
         printf("  array [%3zu] - len: %ld -  %s\n", i, strlen((*data)[i]), (*data)[i]);
     }
 }
 
-int file_write(char **const *const data, const size_t data_length, const char output_file_path[]) {
+int file_write(char **const *const data, const size_t line_count, const char output_file_path[]) {
     printf("[Debug][file] file_write: writing to file - '%s'\n", output_file_path);
 
     FILE *fp = NULL;
@@ -20,7 +20,7 @@ int file_write(char **const *const data, const size_t data_length, const char ou
         exit(-1);
     }
 
-    for (size_t i = 0; i < data_length; i++) {
+    for (size_t i = 0; i < line_count; i++) {
         fprintf(fp, "%s\n", (*data)[i]);
     }
 
@@ -29,7 +29,7 @@ int file_write(char **const *const data, const size_t data_length, const char ou
     return 0;
 }
 
-int file_read(char ***const data, size_t *const data_length, const char input_file_path[]) {
+int file_read(char ***const data, size_t *const line_count, const char input_file_path[]) {
     printf("[Debug][file] file_read: reading from file - %s\n", input_file_path);
 
     char *ln = NULL;         /* NULL forces getline to allocate  */
@@ -70,7 +70,7 @@ int file_read(char ***const data, size_t *const data_length, const char input_fi
         }
     }
 
-    *data_length = index;
+    *line_count = index;
 
     /* Close file */
     if (fp != NULL) {
