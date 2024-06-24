@@ -31,14 +31,21 @@ void test_file(void) {
         printf("[Error][test_file] test_file: unable to read from file\n");
         return;
     }
+    printf("test_file: data pointer = %p\n", data);
+    printf("test_file: *data pointer = %p\n", *data);
+    printf("test_file: **data pointer = %p\n", **data);
+    file_print_data(*data, line_count);
 
-    file_print_data(data, line_count);
+    int write_result = file_write(*data, line_count, output_file_path);
 
-    int write_result = file_write(data, line_count, output_file_path);
-
+    /* free the lines (char*) */
     for (size_t i = 0; i < line_count; i++) {
         free((*data)[i]);
     }
+
+    /* free the array holding the lines (char**) */
     free(*data);
+
+    /* free the pointer holding the address of the array (char***) */
     free(data);
 }

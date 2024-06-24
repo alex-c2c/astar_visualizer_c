@@ -4,14 +4,16 @@
 
 #define LMAX 255
 
-void file_print_data(char **const *const data, const size_t line_count) {
+void file_print_data(char **const data, const size_t line_count) {
+    printf("file_print_data: data pointer = %p\n", data);
     printf("\nLines(%zu) in file:\n\n", line_count);
     for (size_t i = 0; i < line_count; i++) {
-        printf("  array [%3zu] - len: %ld -  %s\n", i, strlen((*data)[i]), (*data)[i]);
+        char *line = (data)[i];
+        printf("  array [%3zu] - len: %ld -  %s\n", i, strlen(line), line);
     }
 }
 
-int file_write(char **const *const data, const size_t line_count, const char output_file_path[]) {
+int file_write(char **data, const size_t line_count, const char output_file_path[]) {
     printf("[Debug][file] file_write: writing to file - '%s'\n", output_file_path);
 
     FILE *fp = NULL;
@@ -21,7 +23,7 @@ int file_write(char **const *const data, const size_t line_count, const char out
     }
 
     for (size_t i = 0; i < line_count; i++) {
-        fprintf(fp, "%s\n", (*data)[i]);
+        fprintf(fp, "%s\n", data[i]);
     }
 
     fclose(fp);
@@ -44,7 +46,8 @@ int file_read(char ***const data, size_t *const line_count, const char input_fil
         exit(-1);
     }
 
-    if (!(*data = calloc(LMAX, sizeof **data))) {
+    char **line_array = malloc(LMAX * sizeof(char *));
+    if (line_array == NULL) {
         fprintf(stderr, "[Error][file] file_read: unable to malloc array\n");
         return -1;
     }
@@ -55,22 +58,27 @@ int file_read(char ***const data, size_t *const line_count, const char input_fil
         if (line_length > 0 && (ln[line_length - 1] == '\n' || ln[line_length - 1] == '\r'))
             ln[--line_length] = 0;
 
-        (*data)[index++] = strdup(ln);
+        if (line_length == 0) {
+            continue;
+        }
+
+        line_array[index++] = strdup(ln);
 
         /* if lmax lines reached, realloc */
         if (index == lmax) {
-            char **tmp = realloc(*data, lmax * 2 * sizeof **data);
+            char **tmp = realloc(line_array, lmax * 2 * sizeof(char **));
             if (tmp == NULL) {
                 printf("[Error][file] file_read: unable to realloc array\n");
                 return -1;
             }
 
-            *data = tmp;
+            line_array = tmp;
             lmax *= 2;
         }
     }
 
     *line_count = index;
+    *data = line_array;
 
     /* Close file */
     if (fp != NULL) {
