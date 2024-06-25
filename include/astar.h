@@ -16,7 +16,7 @@ typedef struct pf_node {
     int h;
 } pf_node_t;
 
-void astar_start_path_finding(list_t *return_path, int col_size, int row_size, int sx, int sy, int ex, int ey, list_t *blockers);
+uint16_t astar_start_path_finding(list_t *return_path, int col_size, int row_size, int sx, int sy, int ex, int ey, list_t *blockers);
 void astar_free_pt(void *d);
 pt_t *astar_create_pt(int x, int y);
 

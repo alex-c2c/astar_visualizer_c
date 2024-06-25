@@ -2,13 +2,14 @@
 #include "../include/list.h"
 #include "../include/minheap.h"
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 pt_t *astar_create_pt(int x, int y) {
     pt_t *pt = malloc(sizeof(pt_t));
     if (pt == NULL) {
-        printf("[Error][astar] astar_create_pt: unable to malloc pt_t\n");
+        fprintf(stderr, "[Error][astar] astar_create_pt: unable to malloc pt_t\n");
         return NULL;
     }
 
@@ -21,13 +22,13 @@ pt_t *astar_create_pt(int x, int y) {
 pf_node_t *astar_create_node(int x, int y, pf_node_t *parent, int f, int g, int h) {
     pt_t *pt = astar_create_pt(x, y);
     if (pt == NULL) {
-        printf("[Error][astar] astar_create_node: unable to malloc pt_t\n");
+        fprintf(stderr, "[Error][astar] astar_create_node: unable to malloc pt_t\n");
         return NULL;
     }
 
     pf_node_t *node = malloc(sizeof(pf_node_t));
     if (node == NULL) {
-        printf("[Error][astar] astar_create_node: unable to malloc pf_node_t\n");
+        fprintf(stderr, "[Error][astar] astar_create_node: unable to malloc pf_node_t\n");
         return NULL;
     }
 
@@ -92,7 +93,7 @@ bool astar_is_diagonal(pt_t *a, pt_t *b) {
 
 void astar_set_return_path(list_t *return_path, pf_node_t *node) {
     if (return_path == NULL) {
-        printf("[Error][Astar] astar_set_return_path: return_path is NULL \n");
+        fprintf(stderr, "[Error][Astar] astar_set_return_path: return_path is NULL \n");
         return;
     }
 
@@ -127,7 +128,6 @@ void astar_set_valid_pts(list_t *valid_pts, pf_node_t *curr_node, pt_t *steps[8]
         pt_t *new_pt = astar_create_pt(nx, ny);
 
         if (list_contains(blockers, new_pt, &astar_comparator_pt)) {
-            printf("found blocker: %d, %d\n", new_pt->x, new_pt->y);
             blocked_array[i] = true;
             astar_free_pt(new_pt);
             continue;
@@ -214,13 +214,19 @@ void astar_free_all(pt_t **steps, list_t *close_list, minheap_t *open_heap, pt_t
     astar_free_pt(end_pt);
 }
 
-void astar_start_path_finding(list_t *return_path, int col_size, int row_size, int sx, int sy, int ex, int ey, list_t *blockers) {
+uint16_t astar_start_path_finding(list_t *return_path, int col_size, int row_size, int sx, int sy, int ex, int ey, list_t *blockers) {
     pf_node_t *start_node = astar_create_node(sx, sy, NULL, 0, 0, 0);
     pt_t *end_pt = astar_create_pt(ex, ey);
 
     pt_t **steps = astar_create_steps();
 
-    list_t *close_list = list_create(10, sizeof(pf_node_t));
+    list_t *close_list = malloc(sizeof(list_t));
+    uint16_t list_create_result = list_create(close_list, 10, sizeof(pf_node_t));
+    if (list_create_result != 0) {
+        fprintf(stderr, "[Error][astar] astar_start_path_finding: unable to create close_list\n");
+        return list_create_result;
+    }
+
     minheap_t *open_heap = minheap_create(sizeof(pf_node_t), 10, &astar_comparator_heap);
     minheap_push(open_heap, start_node);
 
@@ -232,12 +238,18 @@ void astar_start_path_finding(list_t *return_path, int col_size, int row_size, i
 
             astar_free_all(steps, close_list, open_heap, end_pt);
 
-            return;
+            return 0;
         }
 
         list_append(close_list, curr_node);
 
-        list_t *valid_pts = list_create(10, sizeof(pt_t));
+        list_t *valid_pts = malloc(sizeof(list_t));
+        uint16_t list_create_result = list_create(valid_pts, 10, sizeof(pt_t));
+        if (list_create_result != 0) {
+            fprintf(stderr, "[Error][astar] astar_start_path_finding: unable to create valid_pts\n");
+            return list_create_result;
+        }
+
         astar_set_valid_pts(valid_pts, curr_node, steps, blockers, col_size, row_size);
 
         for (int i = 0; i < valid_pts->count; i++) {
@@ -279,5 +291,5 @@ void astar_start_path_finding(list_t *return_path, int col_size, int row_size, i
 
     astar_free_all(steps, close_list, open_heap, end_pt);
 
-    return;
+    return 0;
 }
