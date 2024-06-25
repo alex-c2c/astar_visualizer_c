@@ -2,6 +2,7 @@
 
 static const uint16_t ERROR_MALLOC_FAILED = 1;
 static const uint16_t ERROR_GET_CWD = 2;
+static const uint16_t ERROR_MISSING_ARGS = 3;
 
 static const uint16_t ERROR_FILE_READ = 101;
 static const uint16_t ERROR_FILE_WRITE = 102;

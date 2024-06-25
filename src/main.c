@@ -146,19 +146,14 @@ void apply_return_path_to_grid(list_t *return_path, char ***grid, size_t col_siz
     }
 }
 
-int main(void) {
-    char cwd[PATH_MAX];
-    if (getcwd(cwd, sizeof(cwd)) != NULL) {
-        printf("[Debug][file] test_file: cwd - '%s'\n", cwd);
-    } else {
-        fprintf(stderr, "[Error][file] test_file: unable to get cwd\n");
-        exit(-1);
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        fprintf(stderr, "[Error][main] main: please include input/output file path as arguments\n");
+        exit(ERROR_MISSING_ARGS);
     }
 
-    char input_file_path[PATH_MAX];
-    sprintf(input_file_path, "%s/%s", cwd, "data/input_tile_data.txt");
-    char output_file_path[PATH_MAX];
-    sprintf(output_file_path, "%s/%s", cwd, "data/output_tile_data.txt");
+    char *input_file_path = argv[1];
+    char *output_file_path = argv[2];
 
     size_t file_line_count = 0;
     char ***input_file = get_file_content(input_file_path, &file_line_count);
