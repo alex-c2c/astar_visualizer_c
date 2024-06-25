@@ -37,4 +37,4 @@ prebuild:
 
 clean:
 	$(RM) -rf $(BUILDDIR)
-	$(RM) -rf $(TARGETDIR)
+	#$(RM) -rf $(TARGETDIR)
