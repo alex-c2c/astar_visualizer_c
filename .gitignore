@@ -1,6 +1,11 @@
-.clang-format
-bin/
-.vscode/
+# Individual files
 *.vim
-.DS_Store
+
+# Directiories
+bin/
 obj/
+
+# Hidden Files & Dir
+.vscode/
+.DS_Store
+.clang-format
