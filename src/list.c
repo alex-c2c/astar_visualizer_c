@@ -1,7 +1,13 @@
 #include "../include/list.h"
+#include "../include/errno.h"
+#include <stdint.h>
 
-void list_double_capacity(list_t *const l) {
+uint16_t list_double_capacity(list_t *const l) {
     void **new_array = malloc(l->obj_size * l->capacity * 2);
+    if (new_array == NULL) {
+        fprintf(stderr, "[Error][list] list_double_capacity: unable to malloc new_array\n");
+        return ERROR_MALLOC_FAILED;
+    }
 
     for (int i = 0; i < l->count; ++i) {
         new_array[i] = l->array[i];
@@ -11,25 +17,35 @@ void list_double_capacity(list_t *const l) {
 
     l->array = new_array;
     l->capacity *= 2;
+
+    return 0;
 }
 
-void list_append(list_t *const l, void *data) {
+uint16_t list_append(list_t *const l, void *data) {
     if (l->count == l->capacity) {
-        list_double_capacity(l);
+        uint16_t result = list_double_capacity(l);
+        if (result != 0) {
+            return result;
+        }
     }
 
     l->array[l->count] = data;
     l->count++;
+
+    return 0;
 }
 
-void list_insert(list_t *const l, void *data, int index) {
+uint16_t list_insert(list_t *const l, void *data, int index) {
     if (index < 0 || index >= l->count) {
-        printf("list_insert: Index(%d) out of bounds(%d)\n", index, l->count);
-        return;
+        fprintf(stderr, "[Error][list] list_insert: Index(%d) out of bounds(%d)\n", index, l->count);
+        return ERROR_LIST_OUT_OF_BOUNDS;
     }
 
     if (l->count == l->capacity) {
-        list_double_capacity(l);
+        uint16_t result = list_double_capacity(l);
+        if (result != 0) {
+            return result;
+        }
     }
 
     for (int i = l->count; i > index; i--) {
@@ -38,12 +54,14 @@ void list_insert(list_t *const l, void *data, int index) {
 
     l->array[index] = data;
     l->count++;
+
+    return 0;
 }
 
-void list_remove(list_t *const l, int index, void (*func_free_data)(void *)) {
+uint16_t list_remove(list_t *const l, int index, void (*func_free_data)(void *)) {
     if (index < 0 || index >= l->count) {
-        printf("list_remove: Index(%d) out of bounds(%d)\n", index, l->count);
-        return;
+        fprintf(stderr, "[Error][list] list_remove: Index(%d) out of bounds(%d)\n", index, l->count);
+        return ERROR_LIST_OUT_OF_BOUNDS;
     }
 
     void *data = l->array[index];
@@ -61,6 +79,8 @@ void list_remove(list_t *const l, int index, void (*func_free_data)(void *)) {
     }
 
     l->count--;
+
+    return 0;
 }
 
 bool list_contains(list_t *const l, void *data, bool (*func_cmp)(void *, void *)) {
@@ -90,30 +110,27 @@ void list_free(list_t *const l, void (*func_free_data)(void *)) {
     list_clear(l, func_free_data);
 
     free(l->array);
-
-    free(l);
 }
 
 void *list_get(list_t *const l, int index) {
     if (index >= l->count) {
-        printf("list_remove: Index(%d) out of bounds(%d)\n", index, l->count);
+        printf("[Debug][list] list_remove: Index(%d) out of bounds(%d)\n", index, l->count);
         return NULL;
     }
 
     return l->array[index];
 }
 
-list_t *list_create(int capacity, int obj_size) {
-    list_t *l = malloc(sizeof(list_t));
-    if (l == NULL) {
-        printf("Unable to malloc list\n");
-        return NULL;
+uint16_t list_create(list_t *list, int capacity, int obj_size) {
+    list->array = malloc(capacity * obj_size);
+    if (list->array == NULL) {
+        fprintf(stderr, "[Error][list] Unable to malloc l->array\n");
+        return ERROR_MALLOC_FAILED;
     }
 
-    l->array = malloc(capacity * obj_size);
-    l->count = 0;
-    l->capacity = capacity;
-    l->obj_size = obj_size;
+    list->count = 0;
+    list->capacity = capacity;
+    list->obj_size = obj_size;
 
-    return l;
+    return 0;
 }

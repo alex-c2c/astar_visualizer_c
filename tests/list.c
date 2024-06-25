@@ -1,4 +1,5 @@
 #include "list.h"
+#include "../include/errno.h"
 #include "../include/list.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,13 +23,30 @@ void test_list_print(list_t *l) {
     }
 }
 void test_list() {
-    int obj_size = sizeof(fgh_t *);
+    int obj_size = sizeof(fgh_t);
     int capacity = 5;
-    void **array = malloc(capacity * obj_size);
-    list_t *list = list_create(capacity, obj_size);
+    /*
+    void **array = malloc(capacity * sizeof(fgh_t*));
+    if (array == NULL) {
+        fprintf(stderr, "[Error][test_list] test_list: unable to malloc array\n");
+        exit(ERROR_MALLOC_FAILED);
+    }
+    */
 
-    for (int i = 0; i < 5; i++) {
-        fgh_t *data = malloc(obj_size);
+    list_t *list = malloc(sizeof(list_t));
+    if (list == NULL) {
+        fprintf(stderr, "[Error][test_list] test_list: unable to malloc list_t\n");
+        exit(ERROR_MALLOC_FAILED);
+    }
+
+    uint16_t result = list_create(list, capacity, sizeof(fgh_t *));
+    if (result != 0) {
+        fprintf(stderr, "[Error][test_list] test_list: unable to create list_t\n");
+        exit(result);
+    }
+
+    for (int i = 0; i < 10; i++) {
+        fgh_t *data = malloc(sizeof(fgh_t));
         data->f = i;
         data->h = i;
         data->g = i;
@@ -43,4 +61,5 @@ void test_list() {
     test_list_print(list);
 
     list_free(list, &test_list_free_data);
+    free(list);
 }
