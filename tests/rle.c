@@ -56,7 +56,7 @@ void test_rle() {
     size_t file_line_count = 0;
     int8_t file_read_result = file_read(file_input, &file_line_count, input_file_path);
     if (file_read_result != 0) {
-        fprintf(stderr, "test_rle: unable to read from file\n");
+        fprintf(stderr, "[Error][test_rle] test_rle: unable to read from file\n");
         exit(file_read_result);
     }
 
@@ -65,7 +65,7 @@ void test_rle() {
 
     int decode_result = rle_decode(file_input, decode_output, file_line_count);
     if (decode_result != 0) {
-        fprintf(stderr, "test_rle: decoding failed\n");
+        fprintf(stderr, "[Error][test_rle] test_rle: decoding failed\n");
         exit(decode_result);
     }
 
@@ -77,7 +77,7 @@ void test_rle() {
     char ***encode_output = malloc(sizeof(char **));
     int encode_result = rle_encode(decode_output, encode_output, file_line_count);
     if (encode_result != 0) {
-        fprintf(stderr, "test_rle: encoding failed\n");
+        fprintf(stderr, "[Error][test_rle] test_rle: encoding failed\n");
         exit(encode_result);
     }
 
@@ -89,7 +89,7 @@ void test_rle() {
 
     int32_t file_write_result = file_write(*encode_output, file_line_count, output_file_path);
     if (file_write_result != 0) {
-        fprintf(stderr, "test_rle: unable to write to file\n");
+        fprintf(stderr, "[Error][test_rle] test_rle: unable to write to file\n");
         exit(file_write_result);
     }
 
