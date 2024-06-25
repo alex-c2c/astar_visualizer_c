@@ -1,4 +1,5 @@
 #include "file.h"
+#include "../include/errno.h"
 #include "../include/file.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -14,7 +15,7 @@ void test_file(void) {
         printf("[Debug][file] test_file: cwd - '%s'\n", cwd);
     } else {
         fprintf(stderr, "[Error][file] test_file: unable to get cwd\n");
-        exit(-1);
+        exit(ERROR_GET_CWD);
     }
 
     /* this path CAN be relative to where the program is run! */
@@ -24,6 +25,11 @@ void test_file(void) {
     sprintf(output_file_path, "%s/%s", cwd, "data/output_tile_data.txt");
 
     char ***data = malloc(sizeof(char **));
+    if (data == NULL) {
+        fprintf(stderr, "[Error][test_file] test_file: unable to malloc data\n");
+        exit(ERROR_MALLOC_FAILED);
+    }
+
     size_t line_count = 0;
     int read_result = file_read(data, &line_count, input_file_path);
 
@@ -31,6 +37,7 @@ void test_file(void) {
         printf("[Error][test_file] test_file: unable to read from file\n");
         return;
     }
+
     printf("test_file: data pointer = %p\n", data);
     printf("test_file: *data pointer = %p\n", *data);
     printf("test_file: **data pointer = %p\n", **data);

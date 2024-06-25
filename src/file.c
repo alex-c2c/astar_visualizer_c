@@ -1,4 +1,5 @@
 #include "../include/file.h"
+#include "../include/errno.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -18,8 +19,8 @@ int file_write(char **data, const size_t line_count, const char output_file_path
 
     FILE *fp = NULL;
     if (!(fp = fopen(output_file_path, "w"))) {
-        fprintf(stderr, "[Error][file] file_write: failed to open faile: '%s'\n", output_file_path);
-        exit(-1);
+        fprintf(stderr, "[Error][file] file_write: failed to open file: '%s'\n", output_file_path);
+        return ERROR_FILE_OPEN;
     }
 
     for (size_t i = 0; i < line_count; i++) {
@@ -43,13 +44,13 @@ int file_read(char ***const data, size_t *const line_count, const char input_fil
 
     if (!(fp = fopen(input_file_path, "r"))) {
         fprintf(stderr, "[Error][file] file_read: failed to open file '%s'\n", input_file_path);
-        exit(-1);
+        return ERROR_FILE_OPEN;
     }
 
     char **line_array = malloc(LMAX * sizeof(char *));
     if (line_array == NULL) {
-        fprintf(stderr, "[Error][file] file_read: unable to malloc array\n");
-        return -1;
+        fprintf(stderr, "[Error][file] file_read: unable to malloc line_array\n");
+        return ERROR_MALLOC_FAILED;
     }
 
     while ((line_length = getline(&ln, &n, fp)) != -1) /* read line */
@@ -68,8 +69,8 @@ int file_read(char ***const data, size_t *const line_count, const char input_fil
         if (index == lmax) {
             char **tmp = realloc(line_array, lmax * 2 * sizeof(char **));
             if (tmp == NULL) {
-                printf("[Error][file] file_read: unable to realloc array\n");
-                return -1;
+                fprintf(stderr, "[Error][file] file_read: unable to realloc line_array\n");
+                return ERROR_MALLOC_FAILED;
             }
 
             line_array = tmp;
