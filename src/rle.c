@@ -1,4 +1,5 @@
 #include "../include/rle.h"
+#include "../include/errno.h"
 #include <ctype.h>
 #include <limits.h>
 #include <stdint.h>
@@ -18,6 +19,7 @@ void strcat_c(char *str, char c) {
         ; // note the terminating semicolon here.
     *str++ = c;
 }
+
 /*
  * Input should always be a CHAR follow by DIGITS (of any size)
  * E.g.
@@ -39,7 +41,15 @@ int rle_decode_line(char **input_line, char **output_line) {
 
     printf("[Debug][rle] rle_decode_line: char_count = %d\n", char_count);
     count_array = malloc(char_count * sizeof(uint32_t));
+    if (count_array == NULL) {
+        fprintf(stderr, "rle_decode_line: unable to malloc count_array\n");
+        return ERROR_RLE_MALLOC_FAILED;
+    }
     char_array = malloc((char_count + 1) * sizeof(char));
+    if (char_array == NULL) {
+        fprintf(stderr, "rle_decode_line: unable to malloc char_array\n");
+        return ERROR_RLE_MALLOC_FAILED;
+    }
     char_array[char_count] = '\0';
 
     uint32_t tmp_index = 0;
@@ -55,6 +65,11 @@ int rle_decode_line(char **input_line, char **output_line) {
             uint32_t digit_count = digit_start_index - i;
             if (digit_start_index != -1 && digit_count > 0) {
                 char *num_string = malloc((digit_count + 1) * sizeof(char));
+                if (num_string == NULL) {
+                    fprintf(stderr, "rle_decode_line: unablet to malloc num_string\n");
+                    return ERROR_RLE_MALLOC_FAILED;
+                }
+
                 strncpy(num_string, *input_line + i + 1, digit_count);
 
                 int num = atoi(num_string);
@@ -71,6 +86,10 @@ int rle_decode_line(char **input_line, char **output_line) {
 
     printf("[Debug][rle] rle_decode_line: output_length = %d\n", output_length);
     *output_line = malloc((output_length + 1) * sizeof(char));
+    if (*output_line == NULL) {
+        fprintf(stderr, "rle_decode_line: unable to malloc *output_line\n");
+        return ERROR_RLE_MALLOC_FAILED;
+    }
 
     uint32_t output_index = 0;
     /* side note: using unsigned i with a reverse for loop + >= 0 limiter, will make it enter negative region */
@@ -108,7 +127,15 @@ int rle_encode_line(char **input_line, char **output_line) {
 
     printf("[Debug][rle] rle_encode_line: char_count = %d\n", char_count);
     char *char_array = malloc(char_count * sizeof(char));
+    if (char_array == NULL) {
+        fprintf(stderr, "rle_encode_line: unable to malloc char_array\n");
+        return ERROR_RLE_MALLOC_FAILED;
+    }
     uint32_t *count_array = malloc(char_count * sizeof(uint32_t));
+    if (count_array == NULL) {
+        fprintf(stderr, "rle_encode_line: unable to malloc count_array\n");
+        return ERROR_RLE_MALLOC_FAILED;
+    }
 
     for (uint32_t i = 0; i < char_count; i++) {
         char_array[i] = '\0';
@@ -141,11 +168,21 @@ int rle_encode_line(char **input_line, char **output_line) {
 
     uint32_t tmp_index = 0;
     *output_line = malloc((output_len + 1) * sizeof(char));
+    if (*output_line == NULL) {
+        fprintf(stderr, "rle_encode_line: unable to malloc *output_line\n");
+        return ERROR_RLE_MALLOC_FAILED;
+    }
+
     for (uint32_t i = 0; i < char_count; i++) {
         (*output_line)[tmp_index] = char_array[i];
         tmp_index++;
 
         char *digit_str = malloc(digit_array[i] * sizeof(char));
+        if (digit_str == NULL) {
+            fprintf(stderr, "rle_encode_line: unable to malloc digit_str\n");
+            return ERROR_RLE_MALLOC_FAILED;
+        }
+
         sprintf(digit_str, "%d", count_array[i]);
 
         for (uint32_t j = 0; j < digit_array[i]; j++) {
@@ -170,14 +207,22 @@ int rle_encode_line(char **input_line, char **output_line) {
  */
 int rle_encode(char ***input, char ***output, const size_t line_count) {
     char **output_array = malloc(line_count * sizeof(char *));
+    if (output_array == NULL) {
+        fprintf(stderr, "rle_encode: unable to malloc output_array\n");
+        return ERROR_RLE_MALLOC_FAILED;
+    }
 
     for (size_t i = 0; i < line_count; i++) {
         char *input_line = (*input)[i];
-        char *output_line = malloc(sizeof(char *));
+        char *output_line = malloc(sizeof(char));
+        if (output_line == NULL) {
+            fprintf(stderr, "rle_encode: unable to malloc output_line\n");
+            return ERROR_RLE_MALLOC_FAILED;
+        }
 
         int decode_result = rle_encode_line(&input_line, &output_line);
         if (decode_result != 0) {
-            printf("[Debug][rle] rle_encode: unable to decode line(idx = %ld) = %s\n", i, input_line);
+            fprintf(stderr, "rle_encode: unable to decode line(idx = %ld) = %s\n", i, input_line);
             return decode_result;
         }
 
@@ -194,14 +239,22 @@ int rle_encode(char ***input, char ***output, const size_t line_count) {
  */
 int rle_decode(char **const *const input, char ***const output, const size_t line_count) {
     char **output_array = malloc(line_count * sizeof(char *));
+    if (output_array == NULL) {
+        fprintf(stderr, "rle_decode: unable to malloc output_array\n");
+        return ERROR_RLE_MALLOC_FAILED;
+    }
 
     for (size_t i = 0; i < line_count; i++) {
         char *input_line = (*input)[i];
-        char *output_line = malloc(sizeof(char *));
+        char *output_line = malloc(sizeof(char));
+        if (output_line == NULL) {
+            fprintf(stderr, "rle_decode: unable to malloc output_line\n");
+            return ERROR_RLE_MALLOC_FAILED;
+        }
 
         int decode_result = rle_decode_line(&input_line, &output_line);
         if (decode_result != 0) {
-            printf("[Debug][rle] rle_decode: unable to decode line(idx = %ld) = %s\n", i, input_line);
+            fprintf(stderr, "rle_decode: unable to decode line(idx = %ld) = %s\n", i, input_line);
             return decode_result;
         }
 
