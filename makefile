@@ -13,7 +13,7 @@ SRCEXT := c
 OBJEXT := o
 
 # Flags, Libraries, Includes
-CFLAGS := -Wall -g
+CFLAGS := -Wall -g -fsanitize=address -fsanitize-address-use-after-return=runtime -fsanitize-address-use-after-scope
 CPPFLAGS :=
 INC :=
 LDFLAGS :=
