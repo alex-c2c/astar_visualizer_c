@@ -18,6 +18,6 @@ A C project that is probably full of unseen bugs that was made to accomplish cer
 `make`
 2) Execute program, with absolute file path to the input and output file
 `./bin/main <input_file_path> <output_file_path>`
-3) The actual "Visualizer" part can be found in my other repo: [https://github.com/alex-c2c/astar_visualizer_godot_csharp](astar_visualizer_godot_csharp)
+3) The actual "Visualizer" part can be found in my other repo: [astar_visualizer_godot_csharp](https://github.com/alex-c2c/astar_visualizer_godot_csharp)
 ## Prerequisites
 Example input file found in `data` directory
