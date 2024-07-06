@@ -177,20 +177,21 @@ int rle_encode_line(char **input_line, char **output_line) {
         (*output_line)[tmp_index] = char_array[i];
         tmp_index++;
 
-        char *digit_str = malloc(digit_array[i] * sizeof(char));
-        if (digit_str == NULL) {
-            fprintf(stderr, "[Error][rle] rle_encode_line: unable to malloc digit_str\n");
+        uint32_t len = digit_array[i] + 1;
+        char *digit_char_array = malloc(len * sizeof(char));
+        if (digit_char_array == NULL) {
+            fprintf(stderr, "[Error][rle] rle_encode_line: unable to malloc digit_char_array\n");
             return ERROR_MALLOC_FAILED;
         }
 
-        sprintf(digit_str, "%d", count_array[i]);
+        snprintf(digit_char_array, len, "%d", count_array[i]);
 
         for (uint32_t j = 0; j < digit_array[i]; j++) {
-            (*output_line)[tmp_index] = digit_str[j];
+            (*output_line)[tmp_index] = digit_char_array[j];
             tmp_index++;
         }
 
-        free(digit_str);
+        free(digit_char_array);
     }
 
     (*output_line)[tmp_index] = '\0';
