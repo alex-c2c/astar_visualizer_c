@@ -1,4 +1,4 @@
-# Learning some C
+# A* Path Finding "Visualizer" using C
 ## What is this?
 A C project that is probably full of unseen bugs that was made to accomplish certain criteria.
 1) Read a file that contains lines of run length encoded(RLE) data.
@@ -16,7 +16,8 @@ A C project that is probably full of unseen bugs that was made to accomplish cer
 ## How to use
 1) Compile code using makefile
 `make`
-2) execute program, with absolute file path to the input and output file
+2) Execute program, with absolute file path to the input and output file
 `./bin/main <input_file_path> <output_file_path>`
+3) The actual "Visualizer" part can be found in my other repo: [https://github.com/alex-c2c/astar_visualizer_godot_csharp](astar_visualizer_godot_csharp)
 ## Prerequisites
 Example input file found in `data` directory
